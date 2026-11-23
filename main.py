@@ -7,12 +7,12 @@ import json
 
 def main():
     load_dotenv()
-    token = os.getenv('TG_TOKEN')
-    bot = Bot(token)
-    chat_id = os.getenv('CHAT_ID')
+    tg_token = os.environ['TG_TOKEN']
+    bot = Bot(tg_token)
+    tg_chat_id = os.environ['CHAT_ID']
     url = 'https://dvmn.org/api/long_polling/'
     headers = {
-        "Authorization": f"Token {os.getenv('TOKEN')}",
+        "Authorization": f"Token {os.environ['DEVMAN_TOKEN']}",
     }
     params = {}
     while True:
@@ -31,7 +31,7 @@ def main():
                 else:
                     result = 'Преподавателю все понравилось, можно приступать к следующему уроку!'
                 timestamp = data['last_attempt_timestamp']
-                bot.send_message(chat_id=chat_id, text=f'У вас проверили работу "{lesson_title}." {result}. {lesson_url}')
+                bot.send_message(chat_id=tg_chat_id, text=f'У вас проверили работу "{lesson_title}." {result}. {lesson_url}')
             elif data['status']=='timeout':
                 timestamp = data['timestamp_to_request']
             params['timestamp']=timestamp
@@ -43,4 +43,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
