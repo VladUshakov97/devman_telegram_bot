@@ -20,9 +20,9 @@ def main():
             response = requests.get(url, headers=headers, timeout=5, params=params)
             print(response.request.url)
             response.raise_for_status()
-            data = response.json()
-            if data['status']=='found':
-                reviews = data['new_attempts']
+            response_body = response.json()
+            if response_body['status']=='found':
+                reviews = response_body['new_attempts']
                 review = reviews[0]
                 lesson_title = review['lesson_title']
                 lesson_url = review['lesson_url']
@@ -30,12 +30,12 @@ def main():
                     result = 'К сожалению, в работе нашлись ошибки'
                 else:
                     result = 'Преподавателю все понравилось, можно приступать к следующему уроку!'
-                timestamp = data['last_attempt_timestamp']
+                timestamp = response_body['last_attempt_timestamp']
                 bot.send_message(chat_id=tg_chat_id, text=f'У вас проверили работу "{lesson_title}." {result}. {lesson_url}')
-            elif data['status']=='timeout':
-                timestamp = data['timestamp_to_request']
+            elif response_body['status']=='timeout':
+                timestamp = response_body['timestamp_to_request']
             params['timestamp']=timestamp
-            print(json.dumps(data, ensure_ascii=False, indent=4))
+            print(json.dumps(response_body, ensure_ascii=False, indent=4))
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
