@@ -1,8 +1,10 @@
-import requests
-from telegram import Bot
-from dotenv import load_dotenv
-import os
 import json
+import os
+import time
+
+import requests
+from dotenv import load_dotenv
+from telegram import Bot
 
 
 def main():
@@ -12,13 +14,12 @@ def main():
     tg_chat_id = os.environ['CHAT_ID']
     url = 'https://dvmn.org/api/long_polling/'
     headers = {
-        "Authorization": f"Token {os.environ['DEVMAN_TOKEN']}",
+    "Authorization": f"Token {os.environ['DEVMAN_TOKEN']}",
     }
     params = {}
     while True:
         try:
             response = requests.get(url, headers=headers, timeout=5, params=params)
-            print(response.request.url)
             response.raise_for_status()
             response_body = response.json()
             if response_body['status']=='found':
@@ -35,11 +36,14 @@ def main():
             elif response_body['status']=='timeout':
                 timestamp = response_body['timestamp_to_request']
             params['timestamp']=timestamp
-            print(json.dumps(response_body, ensure_ascii=False, indent=4))
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
+            time.sleep(5)
             continue
+
 
 if __name__ == '__main__':
     main()
+
+    
